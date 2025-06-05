@@ -324,6 +324,106 @@
             font-size: 14px;
         }
         
+        /* Стили для корзины */
+        .cart-icon {
+            position: fixed;
+            top: 25px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1001;
+            background: var(--primary);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        #cart-count {
+            font-size: 14px;
+            margin-left: 3px;
+        }
+        
+        .cart-modal {
+            display: none;
+            position: fixed;
+            z-index: 1002;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: var(--white);
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        #cart-items {
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 20px 0;
+        }
+        
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--gray);
+        }
+        
+        .cart-item-info {
+            flex-grow: 1;
+        }
+        
+        .cart-item-actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        .cart-item-actions button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        
+        .cart-total {
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        
+        #checkout-btn {
+            margin-top: 15px;
+            width: 100%;
+        }
+        
         /* Адаптивность */
         @media (max-width: 768px) {
             .hero h1 {
@@ -345,6 +445,22 @@
     </style>
 </head>
 <body>
+    <!-- Модальное окно корзины -->
+    <div id="cart-modal" class="cart-modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Ваша корзина</h2>
+            <div id="cart-items"></div>
+            <div class="cart-total">
+                <p>Итого: <span id="cart-total-price">0</span> ₽</p>
+                <button id="checkout-btn" class="btn">Оформить заказ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Иконка корзины в шапке -->
+    <div class="cart-icon" id="cart-icon">🛒 <span id="cart-count">0</span></div>
+
     <!-- Шапка -->
     <header>
         <div class="logo">ХомПай</div>
@@ -398,17 +514,17 @@
                     <h3>Боул с запеченым лососем</h3>
                     <p>Свежие помидоры, зелень, лосось, перепелиные яйца, капуста, кукуруза</p>
                     <span class="price">370 ₽</span>
-                    <button class="btn">В корзину</button>
+                    <button class="btn" onclick="addToCart('Боул с запеченым лососем', 370)">В корзину</button>
                 </div>
             </div>
- 	
+            
             <div class="dish-card">
                 <img src="https://images.unsplash.com/photo-1565557623262-b51c2513a641?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Паста" class="dish-img">
                 <div class="dish-info">
                     <h3>Гуляш из говядины</h3>
                     <p>Говядина, фасоль, тертые томаты, сливки. Доставляется с пряной грузинской лепешкой</p>
                     <span class="price">320 ₽</span>
-                    <button class="btn">В корзину</button>
+                    <button class="btn" onclick="addToCart('Гуляш из говядины', 320)">В корзину</button>
                 </div>
             </div>
             <div class="dish-card">
@@ -417,16 +533,16 @@
                     <h3>Пицца Гавайская</h3>
                     <p>Ароматное пряное тесто, красный лук, сыр моцарела, ананасы, свежая зелень</p>
                     <span class="price">480 ₽</span>
-                    <button class="btn">В корзину</button>
+                    <button class="btn" onclick="addToCart('Пицца Гавайская', 480)">В корзину</button>
                 </div>
             </div>
-<div class="dish-card">
+            <div class="dish-card">
                 <img src="https://i.pinimg.com/736x/bf/4c/e7/bf4ce7716c36f622640d957ce0992941.jpg" width="300">
                 <div class="dish-info">
                     <h3>Борщ с пампушками</h3>
                     <p>Классический красный борщ. Доставляется с сальцом и чесночными пампушками</p>
                     <span class="price">290 ₽</span>
-                    <button class="btn">В корзину</button>
+                    <button class="btn" onclick="addToCart('Борщ с пампушками', 290)">В корзину</button>
                 </div>
             </div>
         </div>
@@ -485,5 +601,129 @@
         </div>
         <p class="copyright">© 2025 ХомПай. Все права защищены.</p>
     </footer>
+
+    <script>
+        // Объект корзины
+        const cart = {
+            items: [],
+            total: 0,
+            
+            // Добавление товара
+            addItem(name, price) {
+                const existingItem = this.items.find(item => item.name === name);
+                
+                if (existingItem) {
+                    existingItem.quantity++;
+                } else {
+                    this.items.push({
+                        name,
+                        price,
+                        quantity: 1
+                    });
+                }
+                
+                this.updateTotal();
+                this.updateCartDisplay();
+                this.saveToLocalStorage();
+            },
+            
+            // Удаление товара
+            removeItem(name) {
+                this.items = this.items.filter(item => item.name !== name);
+                this.updateTotal();
+                this.updateCartDisplay();
+                this.saveToLocalStorage();
+            },
+            
+            // Обновление суммы
+            updateTotal() {
+                this.total = this.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            },
+            
+            // Обновление отображения
+            updateCartDisplay() {
+                const cartItemsElement = document.getElementById('cart-items');
+                const cartTotalElement = document.getElementById('cart-total-price');
+                const cartCountElement = document.getElementById('cart-count');
+                
+                // Очищаем корзину
+                cartItemsElement.innerHTML = '';
+                
+                // Добавляем товары
+                this.items.forEach(item => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'cart-item';
+                    itemElement.innerHTML = `
+                        <div class="cart-item-info">
+                            <h4>${item.name}</h4>
+                            <p>${item.price} ₽ x ${item.quantity} = ${item.price * item.quantity} ₽</p>
+                        </div>
+                        <div class="cart-item-actions">
+                            <button onclick="cart.removeItem('${item.name}')">×</button>
+                        </div>
+                    `;
+                    cartItemsElement.appendChild(itemElement);
+                });
+                
+                // Обновляем итоги
+                cartTotalElement.textContent = this.total;
+                cartCountElement.textContent = this.items.reduce((count, item) => count + item.quantity, 0);
+            },
+            
+            // Сохранение в localStorage
+            saveToLocalStorage() {
+                localStorage.setItem('cart', JSON.stringify(this.items));
+            },
+            
+            // Загрузка из localStorage
+            loadFromLocalStorage() {
+                const savedCart = localStorage.getItem('cart');
+                if (savedCart) {
+                    this.items = JSON.parse(savedCart);
+                    this.updateTotal();
+                    this.updateCartDisplay();
+                }
+            }
+        };
+        
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            cart.loadFromLocalStorage();
+            
+            // Модальное окно корзины
+            const modal = document.getElementById('cart-modal');
+            const cartIcon = document.getElementById('cart-icon');
+            const closeBtn = document.querySelector('.close');
+            
+            cartIcon.addEventListener('click', () => {
+                modal.style.display = 'block';
+            });
+            
+            closeBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+            
+            window.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+            
+            // Кнопка оформления заказа
+            document.getElementById('checkout-btn').addEventListener('click', () => {
+                alert(`Заказ оформлен! Сумма: ${cart.total} ₽`);
+                cart.items = [];
+                cart.updateTotal();
+                cart.updateCartDisplay();
+                cart.saveToLocalStorage();
+                modal.style.display = 'none';
+            });
+        });
+        
+        // Функция для добавления в корзину (вызывается из кнопок)
+        function addToCart(name, price) {
+            cart.addItem(name, price);
+        }
+    </script>
 </body>
 </html>
