@@ -424,6 +424,86 @@
             width: 100%;
         }
         
+        /* Стили для форм авторизации */
+        .auth-modal {
+            display: none;
+            position: fixed;
+            z-index: 1003;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .auth-content {
+            background-color: var(--white);
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 400px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--gray);
+        }
+        
+        .auth-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .auth-tab.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .auth-form {
+            display: none;
+        }
+        
+        .auth-form.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .auth-btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+        }
+        
+        .auth-switch {
+            text-align: center;
+            margin-top: 15px;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
         /* Адаптивность */
         @media (max-width: 768px) {
             .hero h1 {
@@ -458,6 +538,47 @@
         </div>
     </div>
 
+    <!-- Модальное окно авторизации/регистрации -->
+    <div id="auth-modal" class="auth-modal">
+        <div class="auth-content">
+            <span class="close">&times;</span>
+            <div class="auth-tabs">
+                <div class="auth-tab active" data-tab="login">Вход</div>
+                <div class="auth-tab" data-tab="register">Регистрация</div>
+            </div>
+            
+            <form id="login-form" class="auth-form active">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Пароль</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" class="btn auth-btn">Войти</button>
+                <div class="auth-switch">Нет аккаунта? Зарегистрироваться</div>
+            </form>
+            
+            <form id="register-form" class="auth-form">
+                <div class="form-group">
+                    <label for="register-name">Имя</label>
+                    <input type="text" id="register-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Пароль</label>
+                    <input type="password" id="register-password" required>
+                </div>
+                <button type="submit" class="btn auth-btn">Зарегистрироваться</button>
+                <div class="auth-switch">Уже есть аккаунт? Войти</div>
+            </form>
+        </div>
+    </div>
+
     <!-- Иконка корзины в шапке -->
     <div class="cart-icon" id="cart-icon">🛒 <span id="cart-count">0</span></div>
 
@@ -468,10 +589,11 @@
             <a href="#how-it-works">Как это работает</a>
             <a href="#menu">Меню</a>
             <a href="#reviews">Отзывы</a>
-            <a href="#" class="btn">Войти</a>
+            <a href="#" class="btn" id="header-login-btn">Войти</a>
         </nav>
     </header>
 
+    <!-- Остальной код сайта остается без изменений -->
     <!-- Герой-секция -->
     <section class="hero">
         <div class="hero-content">
@@ -686,38 +808,175 @@
             }
         };
         
+        // Система авторизации
+        const auth = {
+            currentUser: null,
+            users: JSON.parse(localStorage.getItem('users')) || [],
+            
+            // Регистрация
+            register(name, email, password) {
+                if (this.users.some(user => user.email === email)) {
+                    return { success: false, message: 'Пользователь с таким email уже существует' };
+                }
+                
+                const newUser = { name, email, password };
+                this.users.push(newUser);
+                localStorage.setItem('users', JSON.stringify(this.users));
+                this.currentUser = newUser;
+                return { success: true, user: newUser };
+            },
+            
+            // Вход
+            login(email, password) {
+                const user = this.users.find(user => user.email === email && user.password === password);
+                if (user) {
+                    this.currentUser = user;
+                    return { success: true, user };
+                }
+                return { success: false, message: 'Неверный email или пароль' };
+            },
+            
+            // Выход
+            logout() {
+                this.currentUser = null;
+            },
+            
+            // Проверка авторизации
+            isAuthenticated() {
+                return this.currentUser !== null;
+            }
+        };
+        
         // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', () => {
             cart.loadFromLocalStorage();
             
             // Модальное окно корзины
-            const modal = document.getElementById('cart-modal');
+            const cartModal = document.getElementById('cart-modal');
             const cartIcon = document.getElementById('cart-icon');
-            const closeBtn = document.querySelector('.close');
+            const cartCloseBtn = cartModal.querySelector('.close');
             
             cartIcon.addEventListener('click', () => {
-                modal.style.display = 'block';
+                cartModal.style.display = 'block';
             });
             
-            closeBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
+            cartCloseBtn.addEventListener('click', () => {
+                cartModal.style.display = 'none';
             });
             
             window.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.style.display = 'none';
+                if (e.target === cartModal) {
+                    cartModal.style.display = 'none';
                 }
             });
             
             // Кнопка оформления заказа
             document.getElementById('checkout-btn').addEventListener('click', () => {
-                alert(`Заказ оформлен! Сумма: ${cart.total} ₽`);
-                cart.items = [];
-                cart.updateTotal();
-                cart.updateCartDisplay();
-                cart.saveToLocalStorage();
-                modal.style.display = 'none';
+                if (auth.isAuthenticated()) {
+                    alert(`${auth.currentUser.name}, ваш заказ оформлен! Сумма: ${cart.total} ₽`);
+                    cart.items = [];
+                    cart.updateTotal();
+                    cart.updateCartDisplay();
+                    cart.saveToLocalStorage();
+                    cartModal.style.display = 'none';
+                } else {
+                    cartModal.style.display = 'none';
+                    openAuthModal();
+                }
             });
+            
+            // Модальное окно авторизации
+            const authModal = document.getElementById('auth-modal');
+            const authCloseBtn = authModal.querySelector('.close');
+            const authTabs = document.querySelectorAll('.auth-tab');
+            const authForms = document.querySelectorAll('.auth-form');
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const authSwitchLinks = document.querySelectorAll('.auth-switch');
+            const headerLoginBtn = document.getElementById('header-login-btn');
+            
+            // Переключение между вкладками
+            authTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    authTabs.forEach(t => t.classList.remove('active'));
+                    authForms.forEach(f => f.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    document.getElementById(`${tab.dataset.tab}-form`).classList.add('active');
+                });
+            });
+            
+            // Переключение между формами
+            authSwitchLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const currentTab = link.closest('.auth-form').id.includes('login') ? 'register' : 'login';
+                    document.querySelector(`.auth-tab[data-tab="${currentTab}"]`).click();
+                });
+            });
+            
+            // Закрытие модального окна
+            authCloseBtn.addEventListener('click', () => {
+                authModal.style.display = 'none';
+            });
+            
+            window.addEventListener('click', (e) => {
+                if (e.target === authModal) {
+                    authModal.style.display = 'none';
+                }
+            });
+            
+            // Форма входа
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                
+                const result = auth.login(email, password);
+                if (result.success) {
+                    alert(`Добро пожаловать, ${result.user.name}!`);
+                    authModal.style.display = 'none';
+                    headerLoginBtn.textContent = result.user.name;
+                } else {
+                    alert(result.message);
+                }
+            });
+            
+            // Форма регистрации
+            registerForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('register-name').value;
+                const email = document.getElementById('register-email').value;
+                const password = document.getElementById('register-password').value;
+                
+                const result = auth.register(name, email, password);
+                if (result.success) {
+                    alert(`Регистрация успешна, ${result.user.name}!`);
+                    authModal.style.display = 'none';
+                    headerLoginBtn.textContent = result.user.name;
+                } else {
+                    alert(result.message);
+                }
+            });
+            
+            // Кнопка входа в шапке
+            headerLoginBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (auth.isAuthenticated()) {
+                    if (confirm(`Выйти из аккаунта ${auth.currentUser.name}?`)) {
+                        auth.logout();
+                        headerLoginBtn.textContent = 'Войти';
+                    }
+                } else {
+                    openAuthModal();
+                }
+            });
+            
+            // Функция открытия модального окна авторизации
+            function openAuthModal() {
+                authModal.style.display = 'block';
+                document.querySelector('.auth-tab[data-tab="login"]').click();
+            }
         });
         
         // Функция для добавления в корзину (вызывается из кнопок)
