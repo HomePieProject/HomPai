@@ -1,2 +1,491 @@
 # HomPai
 Сайт С2С-продаж готовых домашних блюд
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ХомПай — Доставка еды от домашних шеф-поваров</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Глобальные стили */
+        :root {
+            --primary: #FF6B6B;
+            --primary-dark: #E05555;
+            --text: #333333;
+            --light-bg: #FFF9F9;
+            --white: #FFFFFF;
+            --gray: #F5F5F5;
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text);
+            line-height: 1.6;
+            background-color: var(--white);
+        }
+        
+        /* Шапка */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--white);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        
+        nav a:hover {
+            color: var(--primary);
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            background-color: var(--primary);
+            color: var(--white);
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+        
+        /* Герой-секция */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 5%;
+            background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), 
+                        url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center/cover;
+        }
+        
+        .hero-content {
+            max-width: 600px;
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+        
+        .hero p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            color: #555;
+        }
+        
+        /* Секция "Как это работает" */
+        .how-it-works {
+            padding: 100px 5%;
+            background-color: var(--light-bg);
+            text-align: center;
+        }
+        
+        .section-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 60px;
+            color: var(--text);
+        }
+        
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+        
+        .step {
+            flex: 1;
+            min-width: 250px;
+            padding: 30px;
+            background-color: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+        }
+        
+        .step:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .step-icon {
+            width: 80px;
+            height: 80px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: var(--white);
+            font-size: 32px;
+        }
+        
+        .step h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+        
+        /* Меню */
+        .menu {
+            padding: 100px 5%;
+            text-align: center;
+        }
+        
+        .dishes {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .dish-card {
+            background-color: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+        }
+        
+        .dish-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dish-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .dish-info {
+            padding: 20px;
+            text-align: left;
+        }
+        
+        .dish-info h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .dish-info p {
+            color: #777;
+            margin-bottom: 15px;
+        }
+        
+        .price {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 20px;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        /* Отзывы */
+        .reviews {
+            padding: 100px 5%;
+            background-color: var(--gray);
+            text-align: center;
+        }
+        
+        .review-cards {
+            display: flex;
+            gap: 30px;
+            overflow-x: auto;
+            padding: 20px 0;
+            scroll-snap-type: x mandatory;
+        }
+        
+        .review-card {
+            min-width: 350px;
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            scroll-snap-align: start;
+        }
+        
+        .review-card p {
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+        
+        .reviewer {
+            display: flex;
+            align-items: center;
+        }
+        
+        .reviewer-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+        
+        .reviewer-info h4 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        
+        .reviewer-info span {
+            color: #777;
+            font-size: 14px;
+        }
+        
+        /* Футер */
+        footer {
+            background-color: var(--text);
+            color: var(--white);
+            padding: 50px 5%;
+            text-align: center;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .footer-links a {
+            color: var(--white);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+        
+        .social-links {
+            margin-bottom: 30px;
+        }
+        
+        .social-links a {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            margin: 0 10px;
+            color: var(--white);
+            line-height: 40px;
+            transition: var(--transition);
+        }
+        
+        .social-links a:hover {
+            background-color: var(--primary);
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .steps {
+                flex-direction: column;
+            }
+            
+            .step {
+                width: 100%;
+            }
+            
+            .review-card {
+                min-width: 280px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Шапка -->
+    <header>
+        <div class="logo">ХомПай</div>
+        <nav>
+            <a href="#how-it-works">Как это работает</a>
+            <a href="#menu">Меню</a>
+            <a href="#reviews">Отзывы</a>
+            <a href="#" class="btn">Войти</a>
+        </nav>
+    </header>
+
+    <!-- Герой-секция -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Домашние блюда без готовки</h1>
+            <p>Любимая домашняя еда без необходимости готовить. 
+Свежие ингредиенты, профессиональное приготовление и быстрая доставка. Оставьте нам заботу о готовке!</p>
+            <a href="#menu" class="btn">Выбрать меню</a>
+        </div>
+    </section>
+
+    <!-- Как это работает -->
+    <section class="how-it-works" id="how-it-works">
+        <h2 class="section-title">Как это работает</h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-icon">1</div>
+                <h3>Выберите блюдо</h3>
+                <p>В нашем меню только лучшие блюда от проверенных шеф-поваров</p>
+            </div>
+            <div class="step">
+                <div class="step-icon">2</div>
+                <h3>Оформите заказ</h3>
+                <p>Укажите день, время доставки и адрес. Мы работаем 7 дней в неделю</p>
+            </div>
+            <div class="step">
+                <div class="step-icon">3</div>
+                <h3>Получите и наслаждайтесь</h3>
+                <p>Наши курьеры доставят заказ вовремя и в идеальном состоянии</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Меню -->
+    <section class="menu" id="menu">
+        <h2 class="section-title">Популярные блюда</h2>
+        <div class="dishes">
+            <div class="dish-card">
+                <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Салат" class="dish-img">
+                <div class="dish-info">
+                    <h3>Боул с запеченым лососем</h3>
+                    <p>Свежие помидоры, зелень, лосось, перепелиные яйца, капуста, кукуруза</p>
+                    <span class="price">370 ₽</span>
+                    <button class="btn">В корзину</button>
+                </div>
+            </div>
+ 	
+            <div class="dish-card">
+                <img src="https://images.unsplash.com/photo-1565557623262-b51c2513a641?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Паста" class="dish-img">
+                <div class="dish-info">
+                    <h3>Гуляш из говядины</h3>
+                    <p>Говядина, фасоль, тертые томаты, сливки. Доставляется с пряной грузинской лепешкой</p>
+                    <span class="price">320 ₽</span>
+                    <button class="btn">В корзину</button>
+                </div>
+            </div>
+            <div class="dish-card">
+                <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Стейк" class="dish-img">
+                <div class="dish-info">
+                    <h3>Пицца Гавайская</h3>
+                    <p>Ароматное пряное тесто, красный лук, сыр моцарела, ананасы, свежая зелень</p>
+                    <span class="price">480 ₽</span>
+                    <button class="btn">В корзину</button>
+                </div>
+            </div>
+<div class="dish-card">
+                <img src="https://i.pinimg.com/736x/bf/4c/e7/bf4ce7716c36f622640d957ce0992941.jpg" width="300">
+                <div class="dish-info">
+                    <h3>Борщ с пампушками</h3>
+                    <p>Классический красный борщ. Доставляется с сальцом и чесночными пампушками</p>
+                    <span class="price">290 ₽</span>
+                    <button class="btn">В корзину</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Отзывы -->
+    <section class="reviews" id="reviews">
+        <h2 class="section-title">Отзывы наших клиентов</h2>
+        <div class="review-cards">
+            <div class="review-card">
+                <p>"Заказываю уже третий раз, все всегда свежее и вкусное. Доставка быстрая, курьеры вежливые. Рекомендую!"</p>
+                <div class="reviewer">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Анна" class="reviewer-img">
+                    <div class="reviewer-info">
+                        <h4>Анна К.</h4>
+                        <span>Постоянный клиент</span>
+                    </div>
+                </div>
+            </div>
+            <div class="review-card">
+                <p>"Порадовало качество блюд - как в хорошем ресторане, но дома. Особенно понравился стейк, идеально прожаренный."</p>
+                <div class="reviewer">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Дмитрий" class="reviewer-img">
+                    <div class="reviewer-info">
+                        <h4>Дмитрий С.</h4>
+                        <span>Новый клиент</span>
+                    </div>
+                </div>
+            </div>
+            <div class="review-card">
+                <p>"Заказали ужин на двоих - все было идеально: от оформления до вкуса. Обязательно будем заказывать еще!"</p>
+                <div class="reviewer">
+                    <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Елена" class="reviewer-img">
+                    <div class="reviewer-info">
+                        <h4>Елена В.</h4>
+                        <span>Постоянный клиент</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Футер -->
+    <footer>
+        <div class="footer-links">
+            <a href="#">О нас</a>
+            <a href="#">Шеф-повара</a>
+            <a href="#">Доставка</a>
+            <a href="#">Контакты</a>
+        </div>
+        <div class="social-links">
+            <a href="#">FB</a>
+            <a href="#">IG</a>
+            <a href="#">TW</a>
+            <a href="#">VK</a>
+        </div>
+        <p class="copyright">© 2025 ХомПай. Все права защищены.</p>
+    </footer>
+</body>
+</html>
