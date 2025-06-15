@@ -434,15 +434,16 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0,0,0,0.5);
+            overflow-y: auto;
         }
         
         .auth-content {
             background-color: var(--white);
-            margin: 10% auto;
+            margin: 5% auto;
             padding: 30px;
             border-radius: 10px;
-            width: 80%;
-            max-width: 400px;
+            width: 90%;
+            max-width: 500px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.2);
             position: relative;
         }
@@ -504,6 +505,60 @@
             font-size: 14px;
         }
         
+        /* Новые стили для выбора типа регистрации */
+        .register-type {
+            display: flex;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        
+        .register-type-btn {
+            flex: 1;
+            padding: 10px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            transition: var(--transition);
+        }
+        
+        .register-type-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary-dark);
+        }
+        
+        /* Стили для поля загрузки файла */
+        .file-upload {
+            margin-top: 10px;
+        }
+        
+        .file-upload-label {
+            display: block;
+            padding: 8px 12px;
+            background: #f0f0f0;
+            border: 1px dashed #ccc;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .file-upload-label:hover {
+            background: #e0e0e0;
+        }
+        
+        .file-upload-input {
+            display: none;
+        }
+        
+        .file-name {
+            font-size: 12px;
+            margin-top: 5px;
+            color: #666;
+        }
+        
         /* Адаптивность */
         @media (max-width: 768px) {
             .hero h1 {
@@ -520,6 +575,15 @@
             
             .review-card {
                 min-width: 280px;
+            }
+            
+            .register-type {
+                flex-direction: column;
+            }
+            
+            .auth-content {
+                margin: 20px auto;
+                padding: 20px;
             }
         }
     </style>
@@ -561,6 +625,15 @@
             </form>
             
             <form id="register-form" class="auth-form">
+                <h3 style="text-align: center; margin-bottom: 15px;">ХомПай</h3>
+                <p style="text-align: center; margin-bottom: 20px; color: #555;">Домашние блюда без готовки</p>
+                <p style="text-align: center; margin-bottom: 20px;">Любимая домашняя еда без необходимости готовить. Свежие ингредиенты, профессиональное приготовление и доставка. Оставьте нам заботу о готовке!</p>
+                
+                <div class="register-type">
+                    <div class="register-type-btn active" data-type="client">Как клиент</div>
+                    <div class="register-type-btn" data-type="chef">Как шеф</div>
+                </div>
+                
                 <div class="form-group">
                     <label for="register-name">Имя</label>
                     <input type="text" id="register-name" required>
@@ -573,6 +646,22 @@
                     <label for="register-password">Пароль</label>
                     <input type="password" id="register-password" required>
                 </div>
+                
+                <div id="chef-fields" style="display: none;">
+                    <div class="form-group">
+                        <label for="medical-book-number">Номер медицинской книжки</label>
+                        <input type="text" id="medical-book-number">
+                    </div>
+                    <div class="form-group">
+                        <label>Скан медицинской книжки</label>
+                        <label for="medical-book-file" class="file-upload-label">
+                            Выберите файл
+                        </label>
+                        <input type="file" id="medical-book-file" class="file-upload-input" accept="image/*,.pdf">
+                        <div id="file-name" class="file-name"></div>
+                    </div>
+                </div>
+                
                 <button type="submit" class="btn auth-btn">Зарегистрироваться</button>
                 <div class="auth-switch">Уже есть аккаунт? Войти</div>
             </form>
@@ -593,7 +682,6 @@
         </nav>
     </header>
 
-    <!-- Остальной код сайта остается без изменений -->
     <!-- Герой-секция -->
     <section class="hero">
         <div class="hero-content">
@@ -814,12 +902,20 @@
             users: JSON.parse(localStorage.getItem('users')) || [],
             
             // Регистрация
-            register(name, email, password) {
+            register(name, email, password, type, medicalBookNumber = null, medicalBookFile = null) {
                 if (this.users.some(user => user.email === email)) {
                     return { success: false, message: 'Пользователь с таким email уже существует' };
                 }
                 
-                const newUser = { name, email, password };
+                const newUser = { 
+                    name, 
+                    email, 
+                    password,
+                    type,
+                    medicalBookNumber,
+                    medicalBookFileName: medicalBookFile ? medicalBookFile.name : null
+                };
+                
                 this.users.push(newUser);
                 localStorage.setItem('users', JSON.stringify(this.users));
                 this.currentUser = newUser;
@@ -844,6 +940,11 @@
             // Проверка авторизации
             isAuthenticated() {
                 return this.currentUser !== null;
+            },
+            
+            // Проверка, является ли пользователь шеф-поваром
+            isChef() {
+                return this.isAuthenticated() && this.currentUser.type === 'chef';
             }
         };
         
@@ -894,6 +995,33 @@
             const registerForm = document.getElementById('register-form');
             const authSwitchLinks = document.querySelectorAll('.auth-switch');
             const headerLoginBtn = document.getElementById('header-login-btn');
+            const registerTypeBtns = document.querySelectorAll('.register-type-btn');
+            const chefFields = document.getElementById('chef-fields');
+            const medicalBookFileInput = document.getElementById('medical-book-file');
+            const fileNameDisplay = document.getElementById('file-name');
+            
+            // Переключение между типами регистрации
+            registerTypeBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    registerTypeBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    if (btn.dataset.type === 'chef') {
+                        chefFields.style.display = 'block';
+                    } else {
+                        chefFields.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Отображение имени выбранного файла
+            medicalBookFileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    fileNameDisplay.textContent = `Выбран файл: ${e.target.files[0].name}`;
+                } else {
+                    fileNameDisplay.textContent = '';
+                }
+            });
             
             // Переключение между вкладками
             authTabs.forEach(tab => {
@@ -948,8 +1076,22 @@
                 const name = document.getElementById('register-name').value;
                 const email = document.getElementById('register-email').value;
                 const password = document.getElementById('register-password').value;
+                const type = document.querySelector('.register-type-btn.active').dataset.type;
                 
-                const result = auth.register(name, email, password);
+                let medicalBookNumber = null;
+                let medicalBookFile = null;
+                
+                if (type === 'chef') {
+                    medicalBookNumber = document.getElementById('medical-book-number').value;
+                    medicalBookFile = medicalBookFileInput.files[0];
+                    
+                    if (!medicalBookNumber || !medicalBookFile) {
+                        alert('Для регистрации как шеф-повар необходимо указать номер медицинской книжки и прикрепить её скан');
+                        return;
+                    }
+                }
+                
+                const result = auth.register(name, email, password, type, medicalBookNumber, medicalBookFile);
                 if (result.success) {
                     alert(`Регистрация успешна, ${result.user.name}!`);
                     authModal.style.display = 'none';
@@ -976,6 +1118,15 @@
             function openAuthModal() {
                 authModal.style.display = 'block';
                 document.querySelector('.auth-tab[data-tab="login"]').click();
+                
+                // Сброс полей регистрации
+                document.getElementById('register-name').value = '';
+                document.getElementById('register-email').value = '';
+                document.getElementById('register-password').value = '';
+                document.getElementById('medical-book-number').value = '';
+                medicalBookFileInput.value = '';
+                fileNameDisplay.textContent = '';
+                document.querySelector('.register-type-btn[data-type="client"]').click();
             }
         });
         
